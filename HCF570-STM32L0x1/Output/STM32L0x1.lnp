@@ -4,6 +4,8 @@
 "..\output\stm32l0xx_hal_msp.o"
 "..\output\lowpower.o"
 "..\output\storage.o"
+"..\output\data_tran.o"
+"..\output\si4463.o"
 "..\output\adc.o"
 "..\output\rtc.o"
 "..\output\spi.o"

@@ -3,6 +3,7 @@
 
 
 void SystemClock_Config_MSI_1MHz(void);
+void SystemClock_Config_MSI_2MHz(void);
 void SystemClock_Config_HSI_32MHz(void);
 
 #endif

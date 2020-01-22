@@ -337,7 +337,7 @@ void AT45_test(void)
 	
 	AT45dbxx_ReadPage(test,264,1);
 	
-	for(i=0;i<264;i++)
+	for(i=0;i<32;i++)
 		log_info("0x%x ",test[i]);
 	log_info("\r\n");
 	
@@ -348,7 +348,7 @@ void AT45_test(void)
 	
 	AT45dbxx_ReadPage(test,264,2);
 	
-	for(i=0;i<264;i++)
+	for(i=0;i<32;i++)
 		log_info("0x%x ",test[i]);
 	log_info("\r\n");
 	

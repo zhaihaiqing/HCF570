@@ -47,3 +47,8 @@
 ..\output\adc.o: ..\BSP\IEEPROM.h
 ..\output\adc.o: ..\Src\lowpower.h
 ..\output\adc.o: ..\Src\storage.h
+..\output\adc.o: ..\Src\data_tran.h
+..\output\adc.o: ..\SI4463\SI4463.h
+..\output\adc.o: ..\SI4463\SI4463_Config_30M.h
+..\output\adc.o: D:\Program Files\Keil_v5\ARM\ARMCC\Bin\..\include\math.h
+..\output\adc.o: D:\Program Files\Keil_v5\ARM\ARMCC\Bin\..\include\stdlib.h

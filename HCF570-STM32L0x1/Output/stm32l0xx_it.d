@@ -47,4 +47,7 @@
 ..\output\stm32l0xx_it.o: ..\BSP\IEEPROM.h
 ..\output\stm32l0xx_it.o: ..\Src\lowpower.h
 ..\output\stm32l0xx_it.o: ..\Src\storage.h
+..\output\stm32l0xx_it.o: ..\Src\data_tran.h
+..\output\stm32l0xx_it.o: ..\SI4463\SI4463.h
+..\output\stm32l0xx_it.o: ..\SI4463\SI4463_Config_30M.h
 ..\output\stm32l0xx_it.o: ../Inc/stm32l0xx_it.h

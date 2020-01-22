@@ -159,6 +159,11 @@ void HAL_ADC_MspDeInit(ADC_HandleTypeDef* hadc)
   if(hadc->Instance==ADC1)
   {
   /* USER CODE BEGIN ADC1_MspDeInit 0 */
+	  
+	 /*##-1- Reset peripherals ##################################################*/
+	ADCx_FORCE_RESET();
+	ADCx_RELEASE_RESET();  //必须增加这两句话，否则ADC的功耗降不下来
+	  
 
   /* USER CODE END ADC1_MspDeInit 0 */
     /* Peripheral clock disable */

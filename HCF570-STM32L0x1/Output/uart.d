@@ -47,3 +47,6 @@
 ..\output\uart.o: ..\BSP\IEEPROM.h
 ..\output\uart.o: ..\Src\lowpower.h
 ..\output\uart.o: ..\Src\storage.h
+..\output\uart.o: ..\Src\data_tran.h
+..\output\uart.o: ..\SI4463\SI4463.h
+..\output\uart.o: ..\SI4463\SI4463_Config_30M.h

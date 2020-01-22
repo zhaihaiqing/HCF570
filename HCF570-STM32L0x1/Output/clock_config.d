@@ -47,3 +47,6 @@
 ..\output\clock_config.o: ..\BSP\IEEPROM.h
 ..\output\clock_config.o: ..\Src\lowpower.h
 ..\output\clock_config.o: ..\Src\storage.h
+..\output\clock_config.o: ..\Src\data_tran.h
+..\output\clock_config.o: ..\SI4463\SI4463.h
+..\output\clock_config.o: ..\SI4463\SI4463_Config_30M.h

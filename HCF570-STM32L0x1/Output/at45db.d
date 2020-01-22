@@ -47,4 +47,7 @@
 ..\output\at45db.o: ..\BSP\IEEPROM.h
 ..\output\at45db.o: ..\Src\lowpower.h
 ..\output\at45db.o: ..\Src\storage.h
+..\output\at45db.o: ..\Src\data_tran.h
+..\output\at45db.o: ..\SI4463\SI4463.h
+..\output\at45db.o: ..\SI4463\SI4463_Config_30M.h
 ..\output\at45db.o: ..\BSP\dataflash\at45db_Config.h

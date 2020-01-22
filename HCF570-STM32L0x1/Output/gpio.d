@@ -47,3 +47,6 @@
 ..\output\gpio.o: ..\BSP\IEEPROM.h
 ..\output\gpio.o: ..\Src\lowpower.h
 ..\output\gpio.o: ..\Src\storage.h
+..\output\gpio.o: ..\Src\data_tran.h
+..\output\gpio.o: ..\SI4463\SI4463.h
+..\output\gpio.o: ..\SI4463\SI4463_Config_30M.h

@@ -11,6 +11,7 @@
 			#define		log_info(...)
 #endif
 
+extern UART_HandleTypeDef hlpuart1;
 
 void MX_LPUART1_UART_Init(void);
 

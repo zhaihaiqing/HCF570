@@ -14,16 +14,16 @@
       <uAC6>0</uAC6>
       <TargetOption>
         <TargetCommonOption>
-          <Device>STM32L031K6Tx</Device>
+          <Device>STM32L031K6Ux</Device>
           <Vendor>STMicroelectronics</Vendor>
           <PackID>Keil.STM32L0xx_DFP.2.0.0</PackID>
           <PackURL>http://www.keil.com/pack/</PackURL>
           <Cpu>IRAM(0x20000000,0x00002000) IROM(0x08000000,0x00008000) CPUTYPE("Cortex-M0+") CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
           <StartupFile></StartupFile>
-          <FlashDriverDll>UL2CM3(-S0 -C0 -P0 -FD20000000 -FC1000 -FN1 -FF0STM32L0xx_32 -FS08000000 -FL08000 -FP0($$Device:STM32L031K6Tx$CMSIS\Flash\STM32L0xx_32.FLM))</FlashDriverDll>
+          <FlashDriverDll>UL2CM3(-S0 -C0 -P0 -FD20000000 -FC1000 -FN1 -FF0STM32L0xx_32 -FS08000000 -FL08000 -FP0($$Device:STM32L031K6Ux$CMSIS\Flash\STM32L0xx_32.FLM))</FlashDriverDll>
           <DeviceId>0</DeviceId>
-          <RegisterFile>$$Device:STM32L031K6Tx$Drivers\CMSIS\Device\ST\STM32L0xx\Include\stm32l0xx.h</RegisterFile>
+          <RegisterFile>$$Device:STM32L031K6Ux$Drivers\CMSIS\Device\ST\STM32L0xx\Include\stm32l0xx.h</RegisterFile>
           <MemoryEnv></MemoryEnv>
           <Cmp></Cmp>
           <Asm></Asm>
@@ -33,7 +33,7 @@
           <SLE66CMisc></SLE66CMisc>
           <SLE66AMisc></SLE66AMisc>
           <SLE66LinkerMisc></SLE66LinkerMisc>
-          <SFDFile>$$Device:STM32L031K6Tx$CMSIS\SVD\STM32L0x1.svd</SFDFile>
+          <SFDFile>$$Device:STM32L031K6Ux$CMSIS\SVD\STM32L0x1.svd</SFDFile>
           <bCustSvd>0</bCustSvd>
           <UseEnv>0</UseEnv>
           <BinPath></BinPath>
@@ -337,7 +337,7 @@
               <MiscControls></MiscControls>
               <Define>USE_HAL_DRIVER,STM32L031xx</Define>
               <Undefine></Undefine>
-              <IncludePath>../Inc;../Drivers/STM32L0xx_HAL_Driver/Inc;../Drivers/STM32L0xx_HAL_Driver/Inc/Legacy;../Drivers/CMSIS/Device/ST/STM32L0xx/Include;../Drivers/CMSIS/Include;..\BSP;..\Src;..\BSP\dataflash</IncludePath>
+              <IncludePath>../Inc;../Drivers/STM32L0xx_HAL_Driver/Inc;../Drivers/STM32L0xx_HAL_Driver/Inc/Legacy;../Drivers/CMSIS/Device/ST/STM32L0xx/Include;../Drivers/CMSIS/Include;..\BSP;..\Src;..\BSP\dataflash;..\SI4463</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -405,6 +405,21 @@
               <FileName>storage.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Src\storage.c</FilePath>
+            </File>
+            <File>
+              <FileName>data_tran.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\data_tran.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>drv_si4463</GroupName>
+          <Files>
+            <File>
+              <FileName>SI4463.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\SI4463\SI4463.c</FilePath>
             </File>
           </Files>
         </Group>

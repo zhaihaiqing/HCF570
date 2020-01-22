@@ -21,6 +21,8 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 
+uint8_t alarm_flag=0;
+uint8_t wakeup_flag=0;
 
 /* Private function prototypes -----------------------------------------------*/
 
@@ -46,7 +48,7 @@ void HAL_Get_CPU_RCC_Clock(void)
 *******************************************************************************/
 void Dev_ReInit(void)
 {
-	SystemClock_Config_MSI_1MHz();		/* Configure the system clock */
+	SystemClock_Config_MSI_2MHz();		/* Configure the system clock */
 	MX_GPIO_Init();
 	MX_SPI1_Init();
 	MX_ADC_Init();
@@ -55,6 +57,7 @@ void Dev_ReInit(void)
 #endif
 	MX_RTC_Init();
 	Set_Alarm();
+	AT45dbxx_Init();
 }
 
 /*******************************************************************************
@@ -66,24 +69,23 @@ void Dev_ReInit(void)
 *******************************************************************************/
 uint32_t sysclk=0;
 uint32_t syscount=0;
+volatile uint32_t re_window=100;
 int main(void)
 {
+	uint8_t i=0;
 	HAL_Init();
 	Dev_ReInit();
-	
 	
 	log_info("Hardware init OK!\r\n");
 	log_info("Flashstorage Size:%d\r\n",sizeof(Datastorage));
 	HAL_Get_CPU_RCC_Clock();
 	
-	AT45dbxx_Init();
+	Deviceinfo.id=0x01;
+	Deviceinfo.sv=0x32;
+	Deviceinfo.dataamount=3;
+	Deviceinfo.start_work_timestamp=0x123456;
 	
-//	Deviceinfo.id=0x01;
-//	Deviceinfo.sv=0x32;
-//	Deviceinfo.dataamount=3;
-//	Deviceinfo.start_work_timestamp=0x123456;
-//	
-//	EEWrite(0,(void *)&Deviceinfo,12);
+	EEWrite(0,(void *)&Deviceinfo,12);
 	
 	HAL_Delay(2000);
 	
@@ -94,23 +96,63 @@ int main(void)
 	
 	EERead(0,(void *)&Deviceinfo,12);
 	log_info("id:0x%x,sv:0x%x,dataamount:0x%x,start_work_timestamp:0x%x\r\n",Deviceinfo.id,Deviceinfo.sv,Deviceinfo.dataamount,Deviceinfo.start_work_timestamp);
-	
-	//AT45_test();
-	
+
+	log_info("Start\r\n");
 	
 	while (1)
 	{
+		/*	alarm醒来，周期1h/次，执行采样任务，进行数据存储，更新设备状态信息	*/
+		if(alarm_flag)	
+		{
+			log_info("HAL_RTC_AlarmAEventCallback\r\n");
+			RTC_CalendarShow();
+			get_adc();
+			//启动存储
+			alarm_flag=0;
+		}
 		
-		RTC_CalendarShow();
+		/*	wakeup醒来，周期10s/次，醒来100ms，等待指令，包含数据获取指令，设备信息指令，RTC授时	*/
+		if(wakeup_flag)
+		{
+			log_info("HAL_RTCEx_WakeUpTimerEventCallback\r\n");
+			RTC_CalendarShow();
+			AT45_test();
+			
+			log_info("SI_POWER_ON\r\n");
+			SI_POWER_ON();
+			HAL_Delay(5);
+			SI446x_Init();
+			
+			re_window=100;
+			while(re_window)//开始计时100ms
+			{
+				//接收指令
+				//处理指令
+				Instruction_Process();
+			}
+			SI_POWER_OFF();//或者进入低功耗模式
+			HAL_Delay(5);
+			wakeup_flag=0;
+		}
+		
+		if((alarm_flag==0)&&(wakeup_flag==0))
+		{
+			enter_stopmode();	//进入低功耗模式
+			//HAL_Get_CPU_RCC_Clock();
+		}
+		HAL_Delay(5);
+		
+		
+		
 		
 		//syscount=HAL_GetTick();
-		get_adc();
+		
 		//syscount=HAL_GetTick()-syscount;
 		//log_info("syscount:%d\r\n",syscount);
 	  
-		HAL_Delay(2000);
-		//enter_stopmode();
-		//HAL_Get_CPU_RCC_Clock();
+		
+		
+		
 	}
 }
 

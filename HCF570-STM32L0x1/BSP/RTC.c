@@ -177,10 +177,10 @@ unsigned char Set_Alarm(void)
 	}
 
 	/** Enable the WakeUp */			//RTC_WakeUp每10s醒来一次，每次醒来执行100ms联网
-//	if (HAL_RTCEx_SetWakeUpTimer_IT(&hrtc, 20480, RTC_WAKEUPCLOCK_RTCCLK_DIV16) != HAL_OK)
-//	{
-//		Error_Handler();
-//	}
+	if (HAL_RTCEx_SetWakeUpTimer_IT(&hrtc, 20480, RTC_WAKEUPCLOCK_RTCCLK_DIV16) != HAL_OK)
+	{
+		Error_Handler();
+	}
 	return 0;
 }
 
@@ -278,7 +278,7 @@ void RTC_Timestamp_To_DateTime(time_t timestamp)
 *******************************************************************************/
 void HAL_RTC_AlarmAEventCallback(RTC_HandleTypeDef *hrtc)
 {
-	log_info("HAL_RTC_AlarmAEventCallback\r\n");
+	alarm_flag=1;
 }
 
 /*******************************************************************************
@@ -290,7 +290,7 @@ void HAL_RTC_AlarmAEventCallback(RTC_HandleTypeDef *hrtc)
 *******************************************************************************/
 void HAL_RTCEx_WakeUpTimerEventCallback(RTC_HandleTypeDef *hrtc)
 {
-	log_info("HAL_RTCEx_WakeUpTimerEventCallback\r\n");
+	wakeup_flag=1;
 }
 
 

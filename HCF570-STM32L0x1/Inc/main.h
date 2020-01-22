@@ -40,12 +40,20 @@ extern "C" {
 #include "IEEPROM.h"
 #include "lowpower.h"
 #include "storage.h"
+#include "data_tran.h"
+#include "SI4463.h"
+#include "SI4463_Config_30M.h"
 
 
-#define LED1_ON()	HAL_GPIO_WritePin(GPIOB,GPIO_PIN_3,0)
-#define LED1_OFF()	HAL_GPIO_WritePin(GPIOB,GPIO_PIN_3,1)
-#define LED1_OR()	HAL_GPIO_TogglePin(GPIOB,GPIO_PIN_3)
+#define LED1_ON()	HAL_GPIO_WritePin(GPIOA,GPIO_PIN_4,0)
+#define LED1_OFF()	HAL_GPIO_WritePin(GPIOA,GPIO_PIN_4,1)
+#define LED1_OR()	HAL_GPIO_TogglePin(GPIOA,GPIO_PIN_4)
 
+
+
+extern uint8_t alarm_flag;
+extern uint8_t wakeup_flag;
+extern volatile uint32_t re_window;//接收时间窗口计时
 
 void HAL_Get_CPU_RCC_Clock(void);
 void Dev_ReInit(void);

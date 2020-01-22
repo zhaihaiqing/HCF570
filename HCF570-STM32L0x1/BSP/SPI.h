@@ -11,7 +11,7 @@
 enum
 {
 	SPI_FLASH=1,
-	SPI_AS10
+	SPI_AS10,
 };
 
 enum spi_mode_e
