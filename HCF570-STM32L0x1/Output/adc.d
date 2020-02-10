@@ -35,6 +35,7 @@
 ..\output\adc.o: ../Drivers/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_uart.h
 ..\output\adc.o: ../Drivers/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_uart_ex.h
 ..\output\adc.o: D:\Program Files\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h
+..\output\adc.o: D:\Program Files\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
 ..\output\adc.o: ..\BSP\Clock_Config.h
 ..\output\adc.o: ..\BSP\ADC.h
 ..\output\adc.o: ..\BSP\RTC.h
@@ -50,5 +51,6 @@
 ..\output\adc.o: ..\Src\data_tran.h
 ..\output\adc.o: ..\SI4463\SI4463.h
 ..\output\adc.o: ..\SI4463\SI4463_Config_30M.h
+..\output\adc.o: ..\Src\check.h
 ..\output\adc.o: D:\Program Files\Keil_v5\ARM\ARMCC\Bin\..\include\math.h
 ..\output\adc.o: D:\Program Files\Keil_v5\ARM\ARMCC\Bin\..\include\stdlib.h

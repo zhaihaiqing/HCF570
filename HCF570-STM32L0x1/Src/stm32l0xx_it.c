@@ -126,8 +126,7 @@ void SysTick_Handler(void)
 {	
 	HAL_IncTick();
 	sys_count++;
-	re_window--;
-	if(re_window==0)re_window=0;
+	if(re_window!=0)re_window--;
 	if(sys_count>200)
 	{
 		LED1_OR();

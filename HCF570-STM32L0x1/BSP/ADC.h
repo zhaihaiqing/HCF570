@@ -13,7 +13,7 @@ extern ADC_HandleTypeDef hadc;
 void MX_ADC_Init(void);
 double get_vdd_v(void);
 double get_temp_t(double vref);
-int16_t get_adc(void);
+short get_adc(uint8_t val_sel);
 
 #endif
 

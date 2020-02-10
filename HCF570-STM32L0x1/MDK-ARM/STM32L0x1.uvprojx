@@ -411,6 +411,11 @@
               <FileType>1</FileType>
               <FilePath>..\Src\data_tran.c</FilePath>
             </File>
+            <File>
+              <FileName>check.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\check.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

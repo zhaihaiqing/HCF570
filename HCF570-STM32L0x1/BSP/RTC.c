@@ -7,6 +7,7 @@
 
 RTC_HandleTypeDef hrtc;
 
+
 unsigned char const table_week[12]={0,3,3,6,1,4,6,2,5,0,3,5};//月修正数据表，平年的月份日期表
 unsigned char const mon_table[12]={31,28,31,30,31,30,31,31,30,31,30,31};//
 
@@ -100,11 +101,19 @@ void MX_RTC_Init(void)
 * Output         : None
 * Return         : None 
 *******************************************************************************/
-void RTC_SetDataTime(unsigned short int syear,unsigned char smon,unsigned char sday,unsigned char hour,unsigned char min,unsigned char sec)
+void RTC_SetDataTime(unsigned short syear,unsigned char smon,unsigned char sday,unsigned char hour,unsigned char min,unsigned char sec)
 {
   RTC_TimeTypeDef sTime = {0};
   RTC_DateTypeDef sDate = {0};
   uint8_t sweek=0;
+  
+    log_info("syear:%d-",syear);
+    log_info("smon:%d-",smon);
+	log_info("sday:%d ",sday);
+	log_info("hour:%d:",hour);
+	log_info("min:%d:",min);
+	log_info("sec:%d\r\n",sec);
+  
   
   sweek=RTC_Get_Week(syear,smon,sday);
   syear=RTC_ByteToBcd2(syear%100);
@@ -157,7 +166,6 @@ unsigned char Set_Alarm(void)
 	RTC_AlarmTypeDef sAlarm;
 	
 	/** Enable the Alarm A */			//闹钟A为每小时醒来一次，每次醒来执行数据采样
-	
 	sAlarm.AlarmTime.Hours = 0x21;
 	sAlarm.AlarmTime.Minutes = 0x35;
 	sAlarm.AlarmTime.Seconds = 0x30;
@@ -177,11 +185,43 @@ unsigned char Set_Alarm(void)
 	}
 
 	/** Enable the WakeUp */			//RTC_WakeUp每10s醒来一次，每次醒来执行100ms联网
-	if (HAL_RTCEx_SetWakeUpTimer_IT(&hrtc, 20480, RTC_WAKEUPCLOCK_RTCCLK_DIV16) != HAL_OK)
+	if (HAL_RTCEx_SetWakeUpTimer_IT(&hrtc, 10*2048, RTC_WAKEUPCLOCK_RTCCLK_DIV16) != HAL_OK)
 	{
 		Error_Handler();
 	}
 	return 0;
+}
+
+unsigned char Set_AlarmA(uint32_t time_sec)
+{
+	RTC_AlarmTypeDef sAlarm;
+	struct tm dev_time;		//定义时间结构体
+	struct tm *p_time=&dev_time;//定义指向时间结构体的指针
+	uint32_t timestamp=0;
+	
+	RTC_CalendarShow(&timestamp);	//获取当前时间戳
+	timestamp=timestamp+time_sec;	//计算下次闹钟时间戳，
+	RTC_Timestamp_To_DateTime(timestamp,p_time);	//转换为时间，设置AlarmA
+	
+	
+	/** Enable the Alarm A */			//闹钟A为每小时醒来一次，每次醒来执行数据采样
+	sAlarm.AlarmTime.Hours = dev_time.tm_hour;
+	sAlarm.AlarmTime.Minutes = dev_time.tm_min;
+	sAlarm.AlarmTime.Seconds = dev_time.tm_sec;
+	sAlarm.AlarmTime.SubSeconds = 0x0;
+	sAlarm.AlarmTime.TimeFormat=RTC_HOURFORMAT12_AM;
+	sAlarm.AlarmTime.DayLightSaving = RTC_DAYLIGHTSAVING_NONE;
+	sAlarm.AlarmTime.StoreOperation = RTC_STOREOPERATION_RESET;
+	//sAlarm.AlarmMask = (uint32_t)(RTC_ALARMMASK_DATEWEEKDAY|RTC_ALARMMASK_HOURS|RTC_ALARMMASK_MINUTES);		//按分钟进行闹钟
+	sAlarm.AlarmSubSecondMask = RTC_ALARMSUBSECONDMASK_NONE;
+	sAlarm.AlarmDateWeekDaySel = RTC_ALARMDATEWEEKDAYSEL_DATE;
+	sAlarm.AlarmDateWeekDay = 0x01;
+	sAlarm.Alarm = RTC_ALARM_A;
+	
+	if (HAL_RTC_SetAlarm_IT(&hrtc, &sAlarm, RTC_FORMAT_BCD) != HAL_OK)
+	{
+		Error_Handler();
+	}
 }
 
 /*******************************************************************************
@@ -191,7 +231,7 @@ unsigned char Set_Alarm(void)
 * Output         : None
 * Return         : None
 *******************************************************************************/
-void RTC_CalendarShow(void)
+void RTC_CalendarShow(uint32_t *p_timestamp)
 {
 	RTC_DateTypeDef sdatestructureget;
 	RTC_TimeTypeDef stimestructureget;
@@ -202,11 +242,15 @@ void RTC_CalendarShow(void)
 	/* Get the RTC current Date */
 	HAL_RTC_GetDate(&hrtc, &sdatestructureget, RTC_FORMAT_BIN);
 	
+	
+	
 	timestamp=RTC_DateTime_To_Timestamp(2000 + sdatestructureget.Year,sdatestructureget.Month,sdatestructureget.Date,\
 						stimestructureget.Hours,stimestructureget.Minutes,stimestructureget.Seconds);
 	
+	*p_timestamp=timestamp;
+	
 	/* Display date Format : mm-dd-yy */
-	log_info("date:%d-%d-%d ", 2000 + sdatestructureget.Year,sdatestructureget.Month, sdatestructureget.Date);
+	log_info("[RTC_CalendarShow]date:%d-%d-%d ", 2000 + sdatestructureget.Year,sdatestructureget.Month, sdatestructureget.Date);
 	/* Display time Format : hh:mm:ss */
 	log_info("%d:%d:%d timestamp:%d\r\n", stimestructureget.Hours, stimestructureget.Minutes, stimestructureget.Seconds,timestamp);
 	
@@ -245,28 +289,23 @@ uint32_t RTC_DateTime_To_Timestamp(unsigned short int syear,unsigned char smon,u
 * Output         : None
 * Return         : None
 *******************************************************************************/
-void RTC_Timestamp_To_DateTime(time_t timestamp)
+void RTC_Timestamp_To_DateTime(time_t timestamp,struct tm *dev_time)
 {
 	struct tm *stm;
-	int syear=0;
-	int smon=0;
-	int sday=0;
-	int hour=0;
-	int min=0;
-	int sec=0;
 	
 	timestamp=timestamp+8*3600;//UTC+8
 	
 	stm=localtime(&timestamp);
 	
-	syear=stm->tm_year+1900;
-	smon=stm->tm_mon+1;
-	sday=stm->tm_mday;
-	hour=stm->tm_hour;
-	min=stm->tm_min;
-	sec=stm->tm_sec;
+	dev_time->tm_year=stm->tm_year+1900;
+	dev_time->tm_mon=stm->tm_mon+1;
+	dev_time->tm_mday=stm->tm_mday;
+	dev_time->tm_hour=stm->tm_hour;
+	dev_time->tm_min=stm->tm_min;
+	dev_time->tm_sec=stm->tm_sec;
 	
-	log_info("timestamp:%d,date:%d-%d-%d %d:%d:%d\r\n",  timestamp,syear,smon,sday,hour,min,sec);
+	log_info("Timestamp_To_DateTime-timestamp:%d,date:%d-%d-%d %d:%d:%d\r\n",  \
+				timestamp,dev_time->tm_year,dev_time->tm_mon,dev_time->tm_mday,dev_time->tm_hour,dev_time->tm_min,dev_time->tm_sec);
 }
 
 /*******************************************************************************
@@ -280,6 +319,7 @@ void HAL_RTC_AlarmAEventCallback(RTC_HandleTypeDef *hrtc)
 {
 	alarm_flag=1;
 }
+
 
 /*******************************************************************************
 * Function Name  : HAL_RTCEx_WakeUpTimerEventCallback

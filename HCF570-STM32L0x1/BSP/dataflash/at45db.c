@@ -341,9 +341,6 @@ void AT45_test(void)
 		log_info("0x%x ",test[i]);
 	log_info("\r\n");
 	
-	
-	
-	
 	//AT45dbxx_ErasePage(1);
 	
 	AT45dbxx_ReadPage(test,264,2);
@@ -352,6 +349,19 @@ void AT45_test(void)
 		log_info("0x%x ",test[i]);
 	log_info("\r\n");
 	
+	
+}
+
+void AT45_Log(uint8_t page_num)
+{
+	unsigned char test[264]={0};
+	unsigned short i=0;
+	
+	AT45dbxx_ReadPage(test,264,page_num);
+	
+	for(i=0;i<264;i++)
+		log_info("0x%x ",test[i]);
+	log_info("\r\n");
 	
 }
 

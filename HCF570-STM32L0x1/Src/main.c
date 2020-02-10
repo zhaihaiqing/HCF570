@@ -24,6 +24,7 @@
 uint8_t alarm_flag=0;
 uint8_t wakeup_flag=0;
 
+
 /* Private function prototypes -----------------------------------------------*/
 
 /*******************************************************************************
@@ -35,8 +36,8 @@ uint8_t wakeup_flag=0;
 *******************************************************************************/
 void HAL_Get_CPU_RCC_Clock(void)
 {
-	log_info("HAL_RCC_SysClockFreq:%fMHz\r\n",1.0*HAL_RCC_GetSysClockFreq()/1000000);
-	log_info("HAL_RCC_HCLKFreq:%fMHz\r\n",1.0*HAL_RCC_GetHCLKFreq()/1000000);
+	log_info("[HAL_Get_CPU_RCC_Clock]HAL_RCC_SysClockFreq:%fMHz\r\n",1.0*HAL_RCC_GetSysClockFreq()/1000000);
+	log_info("[HAL_Get_CPU_RCC_Clock]HAL_RCC_HCLKFreq:%fMHz\r\n",1.0*HAL_RCC_GetHCLKFreq()/1000000);
 }
 
 /*******************************************************************************
@@ -60,6 +61,41 @@ void Dev_ReInit(void)
 	AT45dbxx_Init();
 }
 
+void Dev_parameter_init(void)
+{
+	uint8_t temp[2]={0},i=0;
+	
+	//完成参数初始化
+	//EERead(0x00,temp,2);//执行首次开机标志位判断，确认是否是首次开机
+	
+	log_info("[Dev_parameter_init]first_run_flag:0x%x,0x%x\r\n",temp[0],temp[1]);
+	
+	if( (temp[0] != 0x12) && (temp[1] != 0x34) )
+	{
+		//是首次开机
+		log_info("[Dev_parameter_init]CPU First run\r\n");
+		Deviceinfo.Sample_count=0;
+		Deviceinfo.id=DefaultDeviceADDR;
+		Deviceinfo.dev_ty=DEVICETYPE;
+		Deviceinfo.sv=SOFTWAREVERSION;
+		Deviceinfo.work_time=0;
+		Deviceinfo.temp_c=get_adc(1);//获取温度数据，已放大100倍
+		Deviceinfo.bat_v=get_adc(0);//获取电池电压值，已放大5000倍
+		Deviceinfo.sample_interval=Default_SAMPLE_INTERVAL;
+		Deviceinfo.rx_window=Default_RX_WINDOW;
+		
+		EEWrite(16,(void *)&Deviceinfo,sizeof(Deviceinfo));	
+		
+		//写首次开机标志位
+		temp[0] = 0x12;
+		temp[1] = 0x34;
+		EEWrite(0x00,temp,2);
+	}
+	
+	EERead(16,(void *)&Deviceinfo,sizeof(Deviceinfo));
+	log_info("[Dev_parameter_init]id:0x%x,sv:0x%x,Sample_count:%d\r\n",Deviceinfo.id,Deviceinfo.sv,Deviceinfo.Sample_count);
+}
+
 /*******************************************************************************
 * Function Name  : main
 * Description    : 主函数
@@ -69,69 +105,74 @@ void Dev_ReInit(void)
 *******************************************************************************/
 uint32_t sysclk=0;
 uint32_t syscount=0;
-volatile uint32_t re_window=100;
+uint32_t worktime_buf=0;
+volatile uint32_t re_window=0;
+const char *g_Ashining = "HCF570_embedded_sofware_smartbow_hardware_zhaihaiqing_2020-02-05";
 int main(void)
 {
-	uint8_t i=0;
-	HAL_Init();
-	Dev_ReInit();
+	uint16_t i = 0,j=0;
+	HAL_Init();		//HAL库初始化
+	Dev_ReInit();	//完成硬件初始化
+#ifdef debug_log
+	HAL_Get_CPU_RCC_Clock();	//打印时钟信息
+#endif
+	HAL_Delay(10);
+	Dev_parameter_init();	//完成设备参数初始化
 	
-	log_info("Hardware init OK!\r\n");
-	log_info("Flashstorage Size:%d\r\n",sizeof(Datastorage));
-	HAL_Get_CPU_RCC_Clock();
 	
-	Deviceinfo.id=0x01;
-	Deviceinfo.sv=0x32;
-	Deviceinfo.dataamount=3;
-	Deviceinfo.start_work_timestamp=0x123456;
-	
-	EEWrite(0,(void *)&Deviceinfo,12);
-	
-	HAL_Delay(2000);
-	
-	Deviceinfo.id=0x00;
-	Deviceinfo.sv=0x0;
-	Deviceinfo.dataamount=0;
-	Deviceinfo.start_work_timestamp=0x0;
-	
-	EERead(0,(void *)&Deviceinfo,12);
-	log_info("id:0x%x,sv:0x%x,dataamount:0x%x,start_work_timestamp:0x%x\r\n",Deviceinfo.id,Deviceinfo.sv,Deviceinfo.dataamount,Deviceinfo.start_work_timestamp);
-
-	log_info("Start\r\n");
-	
+	//设备开始运行
+	log_info("[main]Hardware init OK!Cpu Run...\r\n");
+	//log_info("Flashstorage Size:%d\r\n",sizeof(Datastorage));
+		
 	while (1)
 	{
 		/*	alarm醒来，周期1h/次，执行采样任务，进行数据存储，更新设备状态信息	*/
 		if(alarm_flag)	
 		{
-			log_info("HAL_RTC_AlarmAEventCallback\r\n");
-			RTC_CalendarShow();
-			get_adc();
-			//启动存储
+			Set_AlarmA(Deviceinfo.sample_interval);//更新RTC闹钟
+			log_info("[main]HAL_RTC_AlarmAEventCallback\r\n");
+			dev_data_sample_and_storage();//采集数据，同时启动存储
 			alarm_flag=0;
 		}
+		
 		
 		/*	wakeup醒来，周期10s/次，醒来100ms，等待指令，包含数据获取指令，设备信息指令，RTC授时	*/
 		if(wakeup_flag)
 		{
-			log_info("HAL_RTCEx_WakeUpTimerEventCallback\r\n");
-			RTC_CalendarShow();
-			AT45_test();
+			worktime_buf++;	//每10s+1
+			if(worktime_buf==360)
+			{
+				worktime_buf=0;
+				Deviceinfo.work_time++;
+				EEWrite(28,(void *)&Deviceinfo.work_time,2);
+			}
+			log_info("[main]HAL_RTCEx_WakeUpTimerEventCallback\r\n");
+			//RTC_CalendarShow();
 			
-			log_info("SI_POWER_ON\r\n");
 			SI_POWER_ON();
-			HAL_Delay(5);
+			HAL_Delay(2);
 			SI446x_Init();
+			log_info("[main]SI4463_POWER_ON and Init OK!\r\n");
 			
-			re_window=100;
+//			log_info("SI446x_Senddata...\r\n");
+//			SI446x_TX_RX_Data(0,(uint8_t *)g_Ashining,16);
+//			HAL_Delay(500);
+//			SI446x_TX_RX_Data(0,(uint8_t *)g_Ashining,16);
+//			HAL_Delay(1000);
+			
+			re_window=Deviceinfo.rx_window;
+			log_info("[main]SI446x_Rxdata...\r\n");
 			while(re_window)//开始计时100ms
 			{
-				//接收指令
-				//处理指令
-				Instruction_Process();
+				SI446x_TX_RX_Data(1,wl_rx_buff,0);	//接收无线数据
+				if(wl_rx_Flag)	//如果接收完成则执行指令处理函数
+				{
+					Instruction_Process();	
+					
+				}
 			}
 			SI_POWER_OFF();//或者进入低功耗模式
-			HAL_Delay(5);
+			HAL_Delay(2);
 			wakeup_flag=0;
 		}
 		
@@ -140,19 +181,7 @@ int main(void)
 			enter_stopmode();	//进入低功耗模式
 			//HAL_Get_CPU_RCC_Clock();
 		}
-		HAL_Delay(5);
-		
-		
-		
-		
-		//syscount=HAL_GetTick();
-		
-		//syscount=HAL_GetTick()-syscount;
-		//log_info("syscount:%d\r\n",syscount);
-	  
-		
-		
-		
+		//HAL_Delay(5);		
 	}
 }
 

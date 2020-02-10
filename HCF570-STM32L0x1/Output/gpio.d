@@ -35,6 +35,7 @@
 ..\output\gpio.o: ../Drivers/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_uart.h
 ..\output\gpio.o: ../Drivers/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_uart_ex.h
 ..\output\gpio.o: D:\Program Files\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h
+..\output\gpio.o: D:\Program Files\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
 ..\output\gpio.o: ..\BSP\Clock_Config.h
 ..\output\gpio.o: ..\BSP\ADC.h
 ..\output\gpio.o: ..\BSP\RTC.h
@@ -50,3 +51,4 @@
 ..\output\gpio.o: ..\Src\data_tran.h
 ..\output\gpio.o: ..\SI4463\SI4463.h
 ..\output\gpio.o: ..\SI4463\SI4463_Config_30M.h
+..\output\gpio.o: ..\Src\check.h

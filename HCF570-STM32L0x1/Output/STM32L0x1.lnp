@@ -5,6 +5,7 @@
 "..\output\lowpower.o"
 "..\output\storage.o"
 "..\output\data_tran.o"
+"..\output\check.o"
 "..\output\si4463.o"
 "..\output\adc.o"
 "..\output\rtc.o"

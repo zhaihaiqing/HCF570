@@ -8,17 +8,18 @@ enum
 	set_sample_interval,
 	inquire_info,
 	data_request,
-	
 };
 
 
 
+extern uint8_t g_SI4463ItStatus[ 9 ];
+extern uint8_t wl_tx_buff[ 64 ]; 
+extern uint8_t wl_rx_buff[ 64 ]; 
+extern uint8_t wl_rx_Flag;
+extern uint8_t wl_rx_Len;
 
-extern uint8_t wl_rx_buff[64];		//定义接收缓存
-extern uint8_t wl_tx_buff[64];		//定义发送缓存
-
-
-void Instruction_Process(void);
+uint8_t SI446x_TX_RX_Data(uint8_t tx_rx,uint8_t *pbuff,uint8_t len);
+uint8_t Instruction_Process(void);
 
 
 #endif

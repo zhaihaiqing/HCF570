@@ -18,7 +18,18 @@
 //#define SI_SET_CSN_HIGH()			SPI_SELECT(SPI_AS10,1);
 //#define SI_SET_CSN_LOW()			SPI_SELECT(SPI_AS10,0);
 
-
+enum
+{
+	SI4463_Mode_NO_Change=0,
+	SI4463_Mode_Sleep_State,
+	SI4463_Mode_SPI_Active_State,
+	SI4463_Mode_Ready_State,
+	SI4463_Mode_AE_For_Ready_State,
+	SI4463_Mode_Tune_State_For_TX,
+	SI4463_Mode_Tune_State_For_RX,
+	SI4463_Mode_TX_State,
+	SI4463_Mode_RX_State
+};
 
 
 /** SI4463 √¸¡Ó∂®“Â */

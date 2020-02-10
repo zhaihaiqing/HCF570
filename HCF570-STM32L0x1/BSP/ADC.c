@@ -111,13 +111,18 @@ double get_temp_t(double vref)
 }
 
 
+/*******************************************************************************
+* Function Name  : get_adc
+* Description    : 获取ADC值并转换为物理意义的数据
+* Input          : Val_sel: 0：获取电源电压值（放大10000倍，小数点后四位有效数字），1：获取温度值（放大100倍，小数点后两位有效数字）
+* Output         : None
+* Return         : None
+*******************************************************************************/
 #define adc_count	10
-int16_t get_adc(void)
+short get_adc(uint8_t val_sel)
 {
-	uint16_t temp=0;
 	unsigned char i=0;
-//	float vdd[adc_count]={0};
-//	float temp[adc_count]={0};
+	short val=0,temp=0;
 	
 	float vdd_v=0;
 	float temp_t=0;
@@ -136,9 +141,13 @@ int16_t get_adc(void)
 	
 	OP_POWER_OFF();
 	
-	log_info("vdd_v:%fV,temp_T:%f℃\r\n",vdd_v,temp_t);
+	log_info("[get_adc]vdd_v:%fV,temp_T:%f℃\r\n",vdd_v,temp_t);
 	
+	val=vdd_v*5000;
 	temp=temp_t*100;
+	
+	if(val_sel==0)return val;
+	if(val_sel==1)return temp;
 	return temp;
 }
 

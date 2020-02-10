@@ -35,6 +35,7 @@
 ..\output\ieeprom.o: ../Drivers/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_uart.h
 ..\output\ieeprom.o: ../Drivers/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_uart_ex.h
 ..\output\ieeprom.o: D:\Program Files\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h
+..\output\ieeprom.o: D:\Program Files\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
 ..\output\ieeprom.o: ..\BSP\Clock_Config.h
 ..\output\ieeprom.o: ..\BSP\ADC.h
 ..\output\ieeprom.o: ..\BSP\RTC.h
@@ -50,3 +51,4 @@
 ..\output\ieeprom.o: ..\Src\data_tran.h
 ..\output\ieeprom.o: ..\SI4463\SI4463.h
 ..\output\ieeprom.o: ..\SI4463\SI4463_Config_30M.h
+..\output\ieeprom.o: ..\Src\check.h

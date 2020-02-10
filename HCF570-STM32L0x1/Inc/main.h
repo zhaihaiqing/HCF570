@@ -30,6 +30,7 @@ extern "C" {
 /* Includes ------------------------------------------------------------------*/
 #include "stm32l0xx_hal.h"
 #include "stdio.h"
+#include "string.h"
 #include "Clock_Config.h"
 #include "ADC.h"
 #include "RTC.h"
@@ -43,12 +44,18 @@ extern "C" {
 #include "data_tran.h"
 #include "SI4463.h"
 #include "SI4463_Config_30M.h"
+#include "check.h"
 
 
 #define LED1_ON()	HAL_GPIO_WritePin(GPIOA,GPIO_PIN_4,0)
 #define LED1_OFF()	HAL_GPIO_WritePin(GPIOA,GPIO_PIN_4,1)
 #define LED1_OR()	HAL_GPIO_TogglePin(GPIOA,GPIO_PIN_4)
 
+#define DefaultDeviceADDR	0x02	   	//默认器件地址
+#define DEVICETYPE			0x023a	   //HCF570设备类型,将十进制710转换为十六进制
+#define SOFTWAREVERSION		0x0400     //软件版本号定义规则：版本号共三位表示，例如1.2.3，表示方法为：高八位表示1，低八位表示23,其中低八位最大表示99
+#define Default_SAMPLE_INTERVAL		720			//默认数据采集间隔，单位5s，720为1小时
+#define Default_RX_WINDOW	2000			//接收时间窗口，100ms
 
 
 extern uint8_t alarm_flag;

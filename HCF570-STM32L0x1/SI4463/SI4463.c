@@ -17,7 +17,7 @@ uint8_t drv_spi_read_write_byte( uint8_t TxByte )
 {
 	uint8_t ret=0;
 	
-	HAL_SPI_TransmitReceive(&hspi1,&TxByte,&ret,1,100);
+	HAL_SPI_TransmitReceive(&hspi1,&TxByte,&ret,1,0xffff);
 	
 	return ret;		//返回
 }
@@ -482,6 +482,15 @@ void SI446x_Send_Packet( uint8_t *pTxData, uint8_t Length, uint8_t Channel, uint
     l_Cmd[ 4 ] = tx_len;
 	
     SI446x_Write_Cmds( l_Cmd, 5 );		//发送数据包
+	
+	{
+		unsigned char tmp[10]={0};
+		
+		while(!(tmp[4]&0X20))
+		{
+			SI446x_Interrupt_Status(tmp);
+		}
+	}
 }
 
 /**
@@ -648,7 +657,7 @@ uint8_t SI446x_Get_Device_Status( void )
    
    SI446x_Write_Cmds( l_Cmd, 1 );
    SI446x_Read_Response( l_Cmd, 3 );
-   
+  
    return l_Cmd[ 1 ] & 0x0F;
 }
 
@@ -676,13 +685,15 @@ void SI446x_Init( void )
 {
 	//SI446x_Gpio_Init( );		//SI4463引脚初始化
 	SI446x_Reset( );			//SI4463复位
-	SI446x_Power_Up( 30000000 );//reset 后需要Power up设备 晶振30MHz
+	SI446x_Power_Up( RADIO_CONFIGURATION_DATA_RADIO_XO_FREQ );//reset 后需要Power up设备 晶振30MHz
 	SI446x_Config_Init( );		//SI4463模块初始化
-	SI446x_Set_Power( 0x7F );	//功率设置
-	SI446x_Change_Status( 6 );	//切换到RX状态
-	while( 6 != SI446x_Get_Device_Status( ));
+	SI446x_Set_Power( 0x7F );	//功率设置,PA设置，默认0x7F，Range:0-127
+	SI446x_Change_Status( SI4463_Mode_Tune_State_For_RX );	//切换到RX状态
+	while( SI4463_Mode_Tune_State_For_RX != SI446x_Get_Device_Status( ));
 	SI446x_Start_Rx( 0, 0, PACKET_LENGTH,0,0,3 );
 }
+
+
 
 
 
