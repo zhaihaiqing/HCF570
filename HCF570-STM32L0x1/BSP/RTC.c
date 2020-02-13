@@ -165,24 +165,25 @@ unsigned char Set_Alarm(void)
 {
 	RTC_AlarmTypeDef sAlarm;
 	
-	/** Enable the Alarm A */			//闹钟A为每小时醒来一次，每次醒来执行数据采样
-	sAlarm.AlarmTime.Hours = 0x21;
-	sAlarm.AlarmTime.Minutes = 0x35;
-	sAlarm.AlarmTime.Seconds = 0x30;
-	sAlarm.AlarmTime.SubSeconds = 0x0;
-	sAlarm.AlarmTime.TimeFormat=RTC_HOURFORMAT12_AM;
-	sAlarm.AlarmTime.DayLightSaving = RTC_DAYLIGHTSAVING_NONE;
-	sAlarm.AlarmTime.StoreOperation = RTC_STOREOPERATION_RESET;
-	sAlarm.AlarmMask = (uint32_t)(RTC_ALARMMASK_DATEWEEKDAY|RTC_ALARMMASK_HOURS|RTC_ALARMMASK_MINUTES);						//按分钟进行闹钟
-	sAlarm.AlarmSubSecondMask = RTC_ALARMSUBSECONDMASK_NONE;
-	sAlarm.AlarmDateWeekDaySel = RTC_ALARMDATEWEEKDAYSEL_DATE;
-	sAlarm.AlarmDateWeekDay = 0x01;
-	sAlarm.Alarm = RTC_ALARM_A;
-	
-	if (HAL_RTC_SetAlarm_IT(&hrtc, &sAlarm, RTC_FORMAT_BCD) != HAL_OK)
-	{
-		Error_Handler();
-	}
+//	/** Enable the Alarm A */			//闹钟A为每小时醒来一次，每次醒来执行数据采样
+//	sAlarm.AlarmTime.Hours = 0x21;
+//	sAlarm.AlarmTime.Minutes = 0x35;
+//	sAlarm.AlarmTime.Seconds = 0x30;
+//	sAlarm.AlarmTime.SubSeconds = 0x0;
+//	sAlarm.AlarmTime.TimeFormat=RTC_HOURFORMAT12_AM;
+//	sAlarm.AlarmTime.DayLightSaving = RTC_DAYLIGHTSAVING_NONE;
+//	sAlarm.AlarmTime.StoreOperation = RTC_STOREOPERATION_RESET;
+//	//sAlarm.AlarmMask = (uint32_t)(RTC_ALARMMASK_DATEWEEKDAY|RTC_ALARMMASK_HOURS|RTC_ALARMMASK_MINUTES);						//按分钟进行闹钟
+//	sAlarm.AlarmMask = (uint32_t)RTC_ALARMMASK_NONE;
+//	sAlarm.AlarmSubSecondMask = RTC_ALARMSUBSECONDMASK_NONE;
+//	sAlarm.AlarmDateWeekDaySel = RTC_ALARMDATEWEEKDAYSEL_DATE;
+//	sAlarm.AlarmDateWeekDay = 0x01;
+//	sAlarm.Alarm = RTC_ALARM_A;
+//	
+//	if (HAL_RTC_SetAlarm_IT(&hrtc, &sAlarm, RTC_FORMAT_BCD) != HAL_OK)
+//	{
+//		Error_Handler();
+//	}
 
 	/** Enable the WakeUp */			//RTC_WakeUp每10s醒来一次，每次醒来执行100ms联网
 	if (HAL_RTCEx_SetWakeUpTimer_IT(&hrtc, 10*2048, RTC_WAKEUPCLOCK_RTCCLK_DIV16) != HAL_OK)
@@ -200,7 +201,11 @@ unsigned char Set_AlarmA(uint32_t time_sec)
 	uint32_t timestamp=0;
 	
 	RTC_CalendarShow(&timestamp);	//获取当前时间戳
+	
+	log_info("123 Set_AlarmA:%d\r\n",timestamp);
+	
 	timestamp=timestamp+time_sec;	//计算下次闹钟时间戳，
+	
 	RTC_Timestamp_To_DateTime(timestamp,p_time);	//转换为时间，设置AlarmA
 	
 	
@@ -213,6 +218,7 @@ unsigned char Set_AlarmA(uint32_t time_sec)
 	sAlarm.AlarmTime.DayLightSaving = RTC_DAYLIGHTSAVING_NONE;
 	sAlarm.AlarmTime.StoreOperation = RTC_STOREOPERATION_RESET;
 	//sAlarm.AlarmMask = (uint32_t)(RTC_ALARMMASK_DATEWEEKDAY|RTC_ALARMMASK_HOURS|RTC_ALARMMASK_MINUTES);		//按分钟进行闹钟
+	sAlarm.AlarmMask = (uint32_t)RTC_ALARMMASK_NONE;
 	sAlarm.AlarmSubSecondMask = RTC_ALARMSUBSECONDMASK_NONE;
 	sAlarm.AlarmDateWeekDaySel = RTC_ALARMDATEWEEKDAYSEL_DATE;
 	sAlarm.AlarmDateWeekDay = 0x01;
@@ -272,11 +278,13 @@ uint32_t RTC_DateTime_To_Timestamp(unsigned short int syear,unsigned char smon,u
 	stm.tm_year = syear-1900;
 	stm.tm_mon  =smon-1;
 	stm.tm_mday	=sday;
-	stm.tm_hour= hour-8;
+	stm.tm_hour= hour;
 	stm.tm_min=min;
 	stm.tm_sec=sec;
 	
-	timestamp=mktime(&stm);
+	timestamp=mktime(&stm)-8*3600;
+	
+	log_info("[RTC_DateTime_To_Timestamp]:%d\r\n",timestamp);
 	
 	return timestamp;
 }
@@ -308,6 +316,8 @@ void RTC_Timestamp_To_DateTime(time_t timestamp,struct tm *dev_time)
 				timestamp,dev_time->tm_year,dev_time->tm_mon,dev_time->tm_mday,dev_time->tm_hour,dev_time->tm_min,dev_time->tm_sec);
 }
 
+
+
 /*******************************************************************************
 * Function Name  : HAL_RTC_AlarmAEventCallback
 * Description    : 闹钟A的中断服务函数（回调）
@@ -333,6 +343,20 @@ void HAL_RTCEx_WakeUpTimerEventCallback(RTC_HandleTypeDef *hrtc)
 	wakeup_flag=1;
 }
 
+
+
+void time_test(void)
+{
+	time_t timestamp;
+	struct tm	stm;
+	struct tm *p_time=&stm;//定义指向时间结构体的指针
+	
+	
+	
+	timestamp=RTC_DateTime_To_Timestamp(2020,2,10,9,30,30);
+	
+	RTC_Timestamp_To_DateTime(timestamp,p_time);
+}
 
 
 

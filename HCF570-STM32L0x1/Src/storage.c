@@ -25,8 +25,9 @@ void dev_data_sample_and_storage(void)
 	RTC_CalendarShow(&timestamp);
 	temp16=get_adc(1);//获取温度数据
 	
+	log_info("dev_data_sample_and_storage-timestamp:%d\r\n",timestamp);
 	Datastorage.iddet1=0x23;
-	Datastorage.temp=temp16;		//量化为-40-+125℃，分别对应0x00-0xff
+	Datastorage.temp=temp16;		//temp16=真实温度*100，存入flash
 	Datastorage.timestamp=timestamp;
 	Datastorage.sumcheck=(unsigned char)(Check_cumulative_sum((void *)&Datastorage,sizeof(Datastorage)-1) & 0xff);
 	
@@ -61,8 +62,8 @@ void dev_data_sample_and_storage(void)
 	
 	AT45dbxx_WritePage(Flash_buff,264,page_num);//将数据进行存储
 	
-#ifdef debug_log
-	AT45_Log(page_num);//打印第一页
-#endif
+//#ifdef debug_log
+//	AT45_Log(page_num);//打印第一页
+//#endif
 }
 

@@ -143,7 +143,7 @@ short get_adc(uint8_t val_sel)
 	
 	log_info("[get_adc]vdd_v:%fV,temp_T:%f¡æ\r\n",vdd_v,temp_t);
 	
-	val=vdd_v*5000;
+	val=vdd_v*1000/0.15;
 	temp=temp_t*100;
 	
 	if(val_sel==0)return val;

@@ -21,6 +21,9 @@ extern uint8_t wl_rx_Len;
 uint8_t SI446x_TX_RX_Data(uint8_t tx_rx,uint8_t *pbuff,uint8_t len);
 uint8_t Instruction_Process(void);
 
+uint8_t dev_TimeService(uint8_t *p_buf,uint8_t len);
+uint8_t dev_Set_SampleInterval(uint8_t *p_buf,uint8_t len);
+
 
 #endif
 

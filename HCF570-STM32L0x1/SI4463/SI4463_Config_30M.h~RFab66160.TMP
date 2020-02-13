@@ -1,20 +1,6 @@
 #ifndef __SI4463_CONFIG_30M_H
 #define __SI4463_CONFIG_30M_H
 
-/*! @file radio_config.h
- * @brief This file contains the automatically generated
- * configurations.
- *
- * @n WDS GUI Version: 3.2.11.0
- * @n Device: Si4463 Rev.: B1                                 
- *
- * @b COPYRIGHT
- * @n Silicon Laboratories Confidential
- * @n Copyright 2017 Silicon Laboratories, Inc.
- * @n http://www.silabs.com
- */
-
-
 // USER DEFINED PARAMETERS
 // Define your own parameters here
 
@@ -630,4 +616,8 @@
                             RADIO_CONFIGURATION_DATA_RADIO_DELAY_CNT_AFTER_RESET       \
                             }
 
-#endif /* RADIO_CONFIG_H_ */
+
+
+
+#endif
+

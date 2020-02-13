@@ -3,9 +3,6 @@
 
 const static uint8_t config_table[ ] = RADIO_CONFIGURATION_DATA_ARRAY;
 
-
-
-
 /**
   * @brief :SPI收发一个字节
   * @param :
@@ -453,8 +450,8 @@ void SI446x_Reset_TxFifo( void )
 void SI446x_Send_Packet( uint8_t *pTxData, uint8_t Length, uint8_t Channel, uint8_t Condition )
 {
     uint8_t l_Cmd[ 5 ] = { 0 };
-    uint8_t tx_len = Length;
-
+    uint8_t tx_len = Length;	
+	
     SI446x_Reset_TxFifo( );		//清空TX FIFO
 
     SPI_SELECT(SPI_AS10,0);		
@@ -485,10 +482,12 @@ void SI446x_Send_Packet( uint8_t *pTxData, uint8_t Length, uint8_t Channel, uint
 	
 	{
 		unsigned char tmp[10]={0};
+		unsigned count=64;
 		
-		while(!(tmp[4]&0X20))
+		while( (!(tmp[4]&0X20)) && count-- )
 		{
 			SI446x_Interrupt_Status(tmp);
+			HAL_Delay(2);
 		}
 	}
 }
