@@ -57,7 +57,7 @@ extern "C" {
 #define Default_SAMPLE_INTERVAL		6			//默认数据采集间隔，单位5s，720为1小时
 #define Default_RX_WINDOW	2000			//接收时间窗口，100ms
 
-
+extern IWDG_HandleTypeDef hiwdg;
 extern uint8_t alarm_flag;
 extern uint8_t wakeup_flag;
 extern volatile uint32_t re_window;//接收时间窗口计时

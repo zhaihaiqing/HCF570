@@ -27,6 +27,7 @@
 ..\output\si4463.o: ../Drivers/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_flash_ramfunc.h
 ..\output\si4463.o: ../Drivers/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_i2c.h
 ..\output\si4463.o: ../Drivers/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_i2c_ex.h
+..\output\si4463.o: ../Drivers/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_iwdg.h
 ..\output\si4463.o: ../Drivers/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_pwr.h
 ..\output\si4463.o: ../Drivers/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_pwr_ex.h
 ..\output\si4463.o: ../Drivers/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_rtc.h

@@ -38,6 +38,7 @@
 "..\output\stm32l0xx_hal_cortex.o"
 "..\output\stm32l0xx_hal_uart.o"
 "..\output\stm32l0xx_hal_uart_ex.o"
+"..\output\stm32l0xx_hal_iwdg.o"
 "..\output\startup_stm32l031xx.o"
 --library_type=microlib --strict --scatter "..\Output\STM32L0x1.sct"
 --summary_stderr --info summarysizes --map --load_addr_map_info --xref --callgraph --symbols

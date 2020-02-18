@@ -26,6 +26,7 @@
 ..\output\system_stm32l0xx.o: ../Drivers/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_flash_ramfunc.h
 ..\output\system_stm32l0xx.o: ../Drivers/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_i2c.h
 ..\output\system_stm32l0xx.o: ../Drivers/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_i2c_ex.h
+..\output\system_stm32l0xx.o: ../Drivers/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_iwdg.h
 ..\output\system_stm32l0xx.o: ../Drivers/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_pwr.h
 ..\output\system_stm32l0xx.o: ../Drivers/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_pwr_ex.h
 ..\output\system_stm32l0xx.o: ../Drivers/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_rtc.h

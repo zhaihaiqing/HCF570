@@ -24,6 +24,7 @@
 uint8_t alarm_flag=0;
 uint8_t wakeup_flag=0;
 
+IWDG_HandleTypeDef hiwdg;
 
 /* Private function prototypes -----------------------------------------------*/
 
@@ -40,6 +41,20 @@ void HAL_Get_CPU_RCC_Clock(void)
 	log_info("[HAL_Get_CPU_RCC_Clock]HAL_RCC_HCLKFreq:%fMHz\r\n",1.0*HAL_RCC_GetHCLKFreq()/1000000);
 }
 
+
+void MX_IWDG_Init(void)
+{
+  hiwdg.Instance = IWDG;
+  hiwdg.Init.Prescaler = IWDG_PRESCALER_128;
+  hiwdg.Init.Window = 4095;
+  hiwdg.Init.Reload = 4095;
+  if (HAL_IWDG_Init(&hiwdg) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+}
+
 /*******************************************************************************
 * Function Name  : Dev_ReInit
 * Description    : 设备外设初始化
@@ -50,6 +65,7 @@ void HAL_Get_CPU_RCC_Clock(void)
 void Dev_ReInit(void)
 {
 	SystemClock_Config_MSI_2MHz();		/* Configure the system clock */
+	MX_IWDG_Init();
 	MX_GPIO_Init();
 	MX_SPI1_Init();
 	MX_ADC_Init();
@@ -59,6 +75,8 @@ void Dev_ReInit(void)
 	MX_RTC_Init();
 	Set_Alarm();
 	AT45dbxx_Init();
+	
+	HAL_IWDG_Refresh(&hiwdg);//喂狗
 }
 
 void Dev_parameter_init(void)
@@ -69,13 +87,14 @@ void Dev_parameter_init(void)
 	EEWrite(0x00,temp,2);
 	EERead(0x00,temp,2);//执行首次开机标志位判断，确认是否是首次开机
 	
+	HAL_IWDG_Refresh(&hiwdg);//喂狗
 	log_info("[Dev_parameter_init]first_run_flag:0x%x,0x%x\r\n",temp[0],temp[1]);
 	
 	if( (temp[0] != 0x12) && (temp[1] != 0x34) )
 	{
 		//是首次开机
 		
-		AT45dbxx_EraseChip();	//flash擦除
+		//AT45dbxx_EraseChip();	//flash擦除
 		log_info("[Dev_parameter_init]CPU First run\r\n");
 		Deviceinfo.Sample_count=0;
 		Deviceinfo.id=DefaultDeviceADDR;
@@ -97,10 +116,10 @@ void Dev_parameter_init(void)
 	
 	EERead(16,(void *)&Deviceinfo,sizeof(Deviceinfo));
 	log_info("[Dev_parameter_init]id:0x%x,sv:0x%x,Sample_count:%d\r\n",Deviceinfo.id,Deviceinfo.sv,Deviceinfo.Sample_count);
-	
-#ifdef debug_log
-	AT45_Log(1);//打印第一页
-#endif
+	HAL_IWDG_Refresh(&hiwdg);//喂狗
+//#ifdef debug_log
+//	AT45_Log(1);//打印第一页
+//#endif
 }
 
 /*******************************************************************************
@@ -133,6 +152,7 @@ int main(void)
 	//设备开始运行
 	log_info("[main]Hardware init OK!Cpu Run...\r\n");
 	wakeup_flag=1;
+	HAL_IWDG_Refresh(&hiwdg);//喂狗
 	while (1)
 	{
 //		/*	alarm醒来，周期1h/次，执行采样任务，进行数据存储，更新设备状态信息	*/
@@ -146,6 +166,8 @@ int main(void)
 		/*	wakeup醒来，周期10s/次，醒来100ms，等待指令，包含数据获取指令，设备信息指令，RTC授时	*/
 		if(wakeup_flag)
 		{
+			HAL_IWDG_Refresh(&hiwdg);//喂狗
+			
 			log_info("[main]HAL_RTCEx_WakeUpTimerEventCallback\r\n");
 #ifdef debug_log
 			RTC_CalendarShow(&timesp);
@@ -159,6 +181,8 @@ int main(void)
 				EEWrite(28,(void *)&Deviceinfo.work_time,2);
 			}
 			
+			HAL_IWDG_Refresh(&hiwdg);//喂狗
+			
 			samp_count++;
 			log_info("samp_count:%d,Deviceinfo.sample_interval:%d\r\n",samp_count,Deviceinfo.sample_interval);
 			if(samp_count>=Deviceinfo.sample_interval)//最小时间单位5s
@@ -167,7 +191,7 @@ int main(void)
 				dev_data_sample_and_storage();//采集数据，同时启动存储
 			}
 			
-			
+			HAL_IWDG_Refresh(&hiwdg);//喂狗
 			
 			
 			SI_POWER_ON();
@@ -179,6 +203,7 @@ int main(void)
 //			
 			re_window=Deviceinfo.rx_window;
 			log_info("[main]SI446x_Rxdata...\r\n");
+			HAL_IWDG_Refresh(&hiwdg);//喂狗
 			while(re_window)//开始计时100ms
 			{
 				SI446x_TX_RX_Data(1,wl_rx_buff,0);	//接收无线数据
@@ -188,6 +213,7 @@ int main(void)
 					
 				}
 			}
+			HAL_IWDG_Refresh(&hiwdg);//喂狗
 			SI_POWER_OFF();//或者进入低功耗模式
 			HAL_Delay(1);
 			wakeup_flag=0;
@@ -196,6 +222,7 @@ int main(void)
 		
 		if(wakeup_flag==0)
 		{
+			HAL_IWDG_Refresh(&hiwdg);//喂狗
 			enter_stopmode();
 		}
 				

@@ -122,6 +122,8 @@ uint8_t dev_TimeService(uint8_t *p_buf,uint8_t len)
 	
 	RTC_CalendarShow(&timestamp);
 	
+	HAL_IWDG_Refresh(&hiwdg);//喂狗
+	
 	SI_ack[0]=0x55;
 	SI_ack[1]=0xaa;
 	SI_ack[2]=0xa0;
@@ -176,6 +178,8 @@ uint8_t dev_Set_SampleInterval(uint8_t *p_buf,uint8_t len)
 	Deviceinfo.sample_interval=sample_interval;			//更新全局变量
 	Deviceinfo.rx_window=receive_window;				//更新全局变量
 	//Set_AlarmA(Deviceinfo.sample_interval);				//更新RTC闹钟
+	
+	HAL_IWDG_Refresh(&hiwdg);//喂狗
 	
 	SI_ack[0]=0x55;
 	SI_ack[1]=0xaa;
@@ -233,6 +237,8 @@ void dev_inquire_info(uint8_t *p_buf,uint8_t len)
 	//log_info("[dev_inquire_info]timestamp:%d,Receive_Window:%dms,battery_val:%.2f,total_worktime:%dh,SoftwareVersion:0x%x\r\n",\
 				timestamp,Receive_Window,battery_val*0.15/1000,total_worktime,SoftwareVersion);
 	//log_info("[dev_inquire_info]Storage_count:%d\r\n",Deviceinfo.Sample_count);
+	
+	HAL_IWDG_Refresh(&hiwdg);//喂狗
 
 	//HAL_Delay(50);
 	//发送回执
@@ -260,6 +266,8 @@ void dev_inquire_info(uint8_t *p_buf,uint8_t len)
 	//log_info("[dev_inquire_info]time_Ack\r\n");
 	SI446x_TX_RX_Data(0,(uint8_t *)SI_ack,16);
 	//HAL_Delay(30);
+	
+	HAL_IWDG_Refresh(&hiwdg);//喂狗
 	
 	//上传数据
 	SI_ack[0]=0x55;
@@ -325,8 +333,8 @@ void dev_Send_EOT(uint8_t *p_buf,uint8_t len)
 
 	SI_ack[0]=0x55;
 	SI_ack[1]=0xaa;
-	SI_ack[2]=0xa0;
-	SI_ack[3]=p_buf[3]+1;
+	SI_ack[2]=0x80;
+	SI_ack[3]=0;
 	SI_ack[4]=0x09;
 	
 	SI_ack[5]=0x02;
@@ -476,7 +484,7 @@ uint8_t dev_data_request(uint8_t *p_buf,uint8_t len)
 	//ACK
 	//log_info("[dev_data_request]data_Ack\r\n");
 	//HAL_Delay(16);
-	
+	HAL_IWDG_Refresh(&hiwdg);//喂狗
 	
 	/*	
 		数据传输
@@ -501,6 +509,7 @@ uint8_t dev_data_request(uint8_t *p_buf,uint8_t len)
 	for(i=1;i<=page_count;i++)
 	{
 		AT45dbxx_ReadPage(flash_buf,264,i);			//读对应的页，每页32组数据，分为4包，每包8组数
+		HAL_IWDG_Refresh(&hiwdg);//喂狗
 		if(i!=page_count)							//如果不是最后一页数据
 		{
 			for(j=0;j<4;j++)	//分为4包发送
@@ -530,6 +539,7 @@ uint8_t dev_data_request(uint8_t *p_buf,uint8_t len)
 					SI_ack[14+k*5+3]=flash_buf[j*64+k*8+4];
 					SI_ack[14+k*5+4]=flash_buf[j*64+k*8+5];
 					SI_ack[14+k*5+5]=flash_buf[j*64+k*8+6];
+					if(SI_ack[14+k*5+2]==0xff)SI_ack[14+k*5+1]=0xff;
 					log_info("\r\n");
 					log_info("0x%x 0x%x 0x%x 0x%x 0x%x\r\n",SI_ack[14+k*5+1],SI_ack[14+k*5+2],SI_ack[14+k*5+3],SI_ack[14+k*5+4],SI_ack[14+k*5+5]);
 				}
@@ -548,12 +558,14 @@ uint8_t dev_data_request(uint8_t *p_buf,uint8_t len)
 				
 				HAL_Delay(25);
 				
+				HAL_IWDG_Refresh(&hiwdg);//喂狗
 				
-				//等待ACK,10s内无响应则退出
-				timeout1=5000;
+				//等待ACK,6s内无响应则退出
+				timeout1=3000;
 				while(timeout1--)//开始计时100ms
 				{
 					SI446x_TX_RX_Data(1,wl_rx_buff,0);	//接收无线数据
+					HAL_IWDG_Refresh(&hiwdg);//喂狗
 					if(wl_rx_Flag)	//如果接收完成则执行指令处理函数
 					{	
 						log_info("rx reply\r\n");
@@ -581,6 +593,7 @@ uint8_t dev_data_request(uint8_t *p_buf,uint8_t len)
 							while(timeout2--)
 							{
 								SI446x_TX_RX_Data(1,wl_rx_buff,0);	//接收无线数据
+								HAL_IWDG_Refresh(&hiwdg);//喂狗
 								if(wl_rx_Flag)
 								{
 									ack_nack=dev_Extract_Ack(wl_rx_buff,wl_rx_Len);//解析ack类型
@@ -626,6 +639,8 @@ uint8_t dev_data_request(uint8_t *p_buf,uint8_t len)
 				SI_ack[13]=p_buf[9];
 				SI_ack[14]=send_frame_num;
 				
+				HAL_IWDG_Refresh(&hiwdg);//喂狗
+				
 				for(k=0;k<=7;k++)				//每包包含8个数据点
 				{
 					SI_ack[14+k*5+1]=2*((flash_buf[j*64+k*8+1])<<8|flash_buf[j*64+k*8+2])/100+40;		//转换为单字节温度;
@@ -633,6 +648,7 @@ uint8_t dev_data_request(uint8_t *p_buf,uint8_t len)
 					SI_ack[14+k*5+3]=flash_buf[j*64+k*8+4];
 					SI_ack[14+k*5+4]=flash_buf[j*64+k*8+5];
 					SI_ack[14+k*5+5]=flash_buf[j*64+k*8+6];
+					if(SI_ack[14+k*5+2]==0xff)SI_ack[14+k*5+1]=0xff;
 					log_info("\r\n");
 					log_info("0x%x 0x%x 0x%x 0x%x 0x%x\r\n",SI_ack[14+k*5+1],SI_ack[14+k*5+2],SI_ack[14+k*5+3],SI_ack[14+k*5+4],SI_ack[14+k*5+5]);
 				}
@@ -655,12 +671,16 @@ uint8_t dev_data_request(uint8_t *p_buf,uint8_t len)
 				
 				HAL_Delay(60);
 				
+				HAL_IWDG_Refresh(&hiwdg);//喂狗
 				
-				//等待ACK,10s内无响应则退出
-				timeout1=5000;
+				
+				//等待ACK,6s内无响应则退出
+				timeout1=3000;
 				while(timeout1--)//开始计时100ms
 				{
 					SI446x_TX_RX_Data(1,wl_rx_buff,0);	//接收无线数据
+					
+					HAL_IWDG_Refresh(&hiwdg);//喂狗
 					if(wl_rx_Flag)	//如果接收完成则执行指令处理函数
 					{	
 						log_info("rx reply\r\n");
@@ -690,6 +710,7 @@ uint8_t dev_data_request(uint8_t *p_buf,uint8_t len)
 							while(timeout2--)
 							{
 								SI446x_TX_RX_Data(1,wl_rx_buff,0);	//接收无线数据
+								HAL_IWDG_Refresh(&hiwdg);//喂狗
 								if(wl_rx_Flag)
 								{
 									ack_nack=dev_Extract_Ack(wl_rx_buff,wl_rx_Len);//解析ack类型
@@ -777,7 +798,7 @@ uint8_t Instruction_Process(void)
 		return 1;
 	}
 	
-
+		HAL_IWDG_Refresh(&hiwdg);//喂狗
 		switch(data_buf[5])
 		{
 			case time_service:			//授时
