@@ -775,7 +775,7 @@ uint8_t Instruction_Process(void)
 	if(Frame_header!=0x55aa)							err |= 0x02;//判断帧头
 	if(Frame_type!=0x20 )								err |= 0x04;//如果不是下行指令则退出
 	if(dID != Deviceinfo.id)							err |= 0x08;//ID匹配
-	//if(checksum != Frame_checksum  )					err |= 0x10;//校验和错误
+	if(checksum != Frame_checksum  )					err |= 0x10;//校验和错误
 	if((Instruction_code<1) || (Instruction_code>4) )	err |= 0x20;//指令码错误
 	
 	if(Instruction_code==1)
@@ -790,8 +790,8 @@ uint8_t Instruction_Process(void)
 	{
 		if(rx_len!=16)err |= 0x01;//判断接收数据的长度
 	}
-	
-	
+	log_info("data_buf[rx_len-2]:0x%x,data_buf[rx_len-1]:0x%x,\r\n",data_buf[rx_len-2],data_buf[rx_len-1]);
+	log_info("Frame_header:0x%x,Frame_type:0x%x,dID:0x%x,checksum:0x%x,Instruction_code:0x%x,rx_len:0x%x,\r\n",Frame_header,Frame_type,dID,checksum,Instruction_code,rx_len);
 	if(err!=0)
 	{
 		log_info("err:%d\r\n",err);
