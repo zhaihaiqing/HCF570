@@ -84,7 +84,7 @@ void Dev_parameter_init(void)
 	uint8_t temp[2]={0},i=0;
 	
 	//完成参数初始化
-	EEWrite(0x00,temp,2);
+	//EEWrite(0x00,temp,2);
 	EERead(0x00,temp,2);//执行首次开机标志位判断，确认是否是首次开机
 	
 	HAL_IWDG_Refresh(&hiwdg);//喂狗
@@ -199,7 +199,7 @@ int main(void)
 			SI446x_Init();
 			
 //			for(k=0;k<64;k++)test_buff[k]=k;
-//			for(k=0;k<64;k++){SI446x_TX_RX_Data(0,test_buff,64);HAL_Delay(2000);}	//发送测试数据
+//			for(k=0;k<64;k++){SI446x_TX_RX_Data(0,test_buff,32);HAL_Delay(2000);}	//发送测试数据
 //			
 			re_window=Deviceinfo.rx_window;
 			log_info("[main]SI446x_Rxdata...\r\n");

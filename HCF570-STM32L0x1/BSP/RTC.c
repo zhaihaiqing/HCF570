@@ -107,12 +107,12 @@ void RTC_SetDataTime(unsigned short syear,unsigned char smon,unsigned char sday,
   RTC_DateTypeDef sDate = {0};
   uint8_t sweek=0;
   
-    log_info("syear:%d-",syear);
-    log_info("smon:%d-",smon);
-	log_info("sday:%d ",sday);
-	log_info("hour:%d:",hour);
-	log_info("min:%d:",min);
-	log_info("sec:%d\r\n",sec);
+//    log_info("syear:%d-",syear);
+//    log_info("smon:%d-",smon);
+//	log_info("sday:%d ",sday);
+//	log_info("hour:%d:",hour);
+//	log_info("min:%d:",min);
+//	log_info("sec:%d\r\n",sec);
   
   
   sweek=RTC_Get_Week(syear,smon,sday);

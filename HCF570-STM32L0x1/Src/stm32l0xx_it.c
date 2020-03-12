@@ -127,9 +127,20 @@ void SysTick_Handler(void)
 	HAL_IncTick();
 	sys_count++;
 	if(re_window!=0)re_window--;
-	if(sys_count>200)
+	
+//	if(sys_count>200)
+//	{
+//		LED1_OR();
+//		sys_count=0;
+//	}
+	
+	if(sys_count==75)
 	{
-		LED1_OR();
+		LED1_ON();
+	}
+	else if(sys_count>=100)
+	{
+		LED1_OFF();
 		sys_count=0;
 	}
 }

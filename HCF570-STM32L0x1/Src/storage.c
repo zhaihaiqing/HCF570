@@ -60,7 +60,8 @@ void dev_data_sample_and_storage(void)
 	Flash_buff[in_page_num*8+6]=Datastorage.timestamp&0xff;
 	Flash_buff[in_page_num*8+7]=Datastorage.sumcheck;
 	
-	AT45dbxx_WritePage(Flash_buff,264,page_num);//将数据进行存储
+	if(page_num<2000)
+		AT45dbxx_WritePage(Flash_buff,264,page_num);//将数据进行存储
 	
 //#ifdef debug_log
 //	AT45_Log(page_num);//打印第一页

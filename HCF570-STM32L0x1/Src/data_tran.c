@@ -105,24 +105,7 @@ uint8_t dev_TimeService(uint8_t *p_buf,uint8_t len)
 	
 	if((timestamp<946656000) || (timestamp>2524579199))return 1;
 	
-	log_info("[dev_TimeService]timestamp:0x%x\r\n",timestamp);
-	/*	1：将时间戳转换为时间，获取的时间戳符合网络时间戳规范，由于嵌入式无时区概念，所以存储时按照UTC+0进行存储	*/
-	RTC_Timestamp_To_DateTime(timestamp,p_time);//将时间戳转换为时间
-	log_info("[dev_TimeService]tm_year:%d-",dev_time.tm_year);
-	log_info("%d-",dev_time.tm_mon);
-	log_info("%d ",dev_time.tm_mday);
-	log_info("%d:",dev_time.tm_hour);
-	log_info("%d:",dev_time.tm_min);
-	log_info("%d\r\n",dev_time.tm_sec);
-	
-	/*	2：将时间进行存储			*/
-	RTC_SetDataTime(dev_time.tm_year,dev_time.tm_mon,dev_time.tm_mday,dev_time.tm_hour,dev_time.tm_min,dev_time.tm_sec);//设置时间			
-	
-	//HAL_Delay(3000);
-	
-	RTC_CalendarShow(&timestamp);
-	
-	HAL_IWDG_Refresh(&hiwdg);//喂狗
+	//HAL_Delay(10);
 	
 	SI_ack[0]=0x55;
 	SI_ack[1]=0xaa;
@@ -148,7 +131,27 @@ uint8_t dev_TimeService(uint8_t *p_buf,uint8_t len)
 	//ACK
 	//log_info("[dev_TimeService]time_Ack\r\n");
 	SI446x_TX_RX_Data(0,(uint8_t *)SI_ack,16);
-	//HAL_Delay(20);	
+	//HAL_Delay(20);
+	
+	
+	log_info("[dev_TimeService]timestamp:0x%x\r\n",timestamp);
+	/*	1：将时间戳转换为时间，获取的时间戳符合网络时间戳规范，由于嵌入式无时区概念，所以存储时按照UTC+0进行存储	*/
+	RTC_Timestamp_To_DateTime(timestamp,p_time);//将时间戳转换为时间
+	log_info("[dev_TimeService]tm_year:%d-",dev_time.tm_year);
+	log_info("%d-",dev_time.tm_mon);
+	log_info("%d ",dev_time.tm_mday);
+	log_info("%d:",dev_time.tm_hour);
+	log_info("%d:",dev_time.tm_min);
+	log_info("%d\r\n",dev_time.tm_sec);
+	
+	/*	2：将时间进行存储			*/
+	RTC_SetDataTime(dev_time.tm_year,dev_time.tm_mon,dev_time.tm_mday,dev_time.tm_hour,dev_time.tm_min,dev_time.tm_sec);//设置时间			
+	
+	//HAL_Delay(3000);
+	
+	RTC_CalendarShow(&timestamp);
+	
+	HAL_IWDG_Refresh(&hiwdg);//喂狗
 }
 
 /*******************************************************************************
@@ -240,7 +243,7 @@ void dev_inquire_info(uint8_t *p_buf,uint8_t len)
 	
 	HAL_IWDG_Refresh(&hiwdg);//喂狗
 
-	//HAL_Delay(50);
+	HAL_Delay(15);
 	//发送回执
 	SI_ack[0]=0x55;
 	SI_ack[1]=0xaa;
@@ -265,7 +268,7 @@ void dev_inquire_info(uint8_t *p_buf,uint8_t len)
 	//ACK
 	//log_info("[dev_inquire_info]time_Ack\r\n");
 	SI446x_TX_RX_Data(0,(uint8_t *)SI_ack,16);
-	//HAL_Delay(30);
+	//HAL_Delay(15);
 	
 	HAL_IWDG_Refresh(&hiwdg);//喂狗
 	
@@ -550,13 +553,13 @@ uint8_t dev_data_request(uint8_t *p_buf,uint8_t len)
 				SI_ack[56]=checksum&0xff;
 	
 		try_send_again1:	//如果发生错误，重传，最大次数5
-				
+				HAL_Delay(15);
 				SI446x_TX_RX_Data(0,(uint8_t *)SI_ack,32);
-				HAL_Delay(32);
+				HAL_Delay(15);
 				
 				SI446x_TX_RX_Data(0,(uint8_t *)&SI_ack[32],25);
 				
-				HAL_Delay(25);
+				HAL_Delay(15);
 				
 				HAL_IWDG_Refresh(&hiwdg);//喂狗
 				
@@ -662,14 +665,15 @@ uint8_t dev_data_request(uint8_t *p_buf,uint8_t len)
 				log_info("\r\n");
 	
 		try_send_again2:	//如果发生错误，重传，最大次数5
+				HAL_Delay(15);
 				SI446x_TX_RX_Data(0,(uint8_t *)SI_ack,32);
-				HAL_Delay(32);
+				HAL_Delay(15);
 				
 				SI446x_TX_RX_Data(0,(uint8_t *)&SI_ack[32],25);
 				
-				HAL_Delay(25);
+				HAL_Delay(15);
 				
-				HAL_Delay(60);
+				//HAL_Delay(60);
 				
 				HAL_IWDG_Refresh(&hiwdg);//喂狗
 				
@@ -775,7 +779,7 @@ uint8_t Instruction_Process(void)
 	if(Frame_header!=0x55aa)							err |= 0x02;//判断帧头
 	if(Frame_type!=0x20 )								err |= 0x04;//如果不是下行指令则退出
 	if(dID != Deviceinfo.id)							err |= 0x08;//ID匹配
-	if(checksum != Frame_checksum  )					err |= 0x10;//校验和错误
+	//if(checksum != Frame_checksum  )					err |= 0x10;//校验和错误
 	if((Instruction_code<1) || (Instruction_code>4) )	err |= 0x20;//指令码错误
 	
 	if(Instruction_code==1)
