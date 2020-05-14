@@ -537,7 +537,7 @@ uint8_t dev_data_request(uint8_t *p_buf,uint8_t len)
 				
 				for(k=0;k<=7;k++)				//每包包含8个数据点
 				{
-					SI_ack[14+k*5+1]=2*((flash_buf[j*64+k*8+1])<<8|flash_buf[j*64+k*8+2])/100+40;		//转换为单字节温度;
+					SI_ack[14+k*5+1]=1.5*((flash_buf[j*64+k*8+1])<<8|flash_buf[j*64+k*8+2])/100+30;		//转换为单字节温度;
 					SI_ack[14+k*5+2]=flash_buf[j*64+k*8+3];
 					SI_ack[14+k*5+3]=flash_buf[j*64+k*8+4];
 					SI_ack[14+k*5+4]=flash_buf[j*64+k*8+5];
@@ -646,7 +646,7 @@ uint8_t dev_data_request(uint8_t *p_buf,uint8_t len)
 				
 				for(k=0;k<=7;k++)				//每包包含8个数据点
 				{
-					SI_ack[14+k*5+1]=2*((flash_buf[j*64+k*8+1])<<8|flash_buf[j*64+k*8+2])/100+40;		//转换为单字节温度;
+					SI_ack[14+k*5+1]=1.5*((flash_buf[j*64+k*8+1])<<8|flash_buf[j*64+k*8+2])/100+30;		//转换为单字节温度;
 					SI_ack[14+k*5+2]=flash_buf[j*64+k*8+3];
 					SI_ack[14+k*5+3]=flash_buf[j*64+k*8+4];
 					SI_ack[14+k*5+4]=flash_buf[j*64+k*8+5];
