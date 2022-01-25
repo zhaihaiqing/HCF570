@@ -51,10 +51,10 @@ extern "C" {
 #define LED1_OFF()	HAL_GPIO_WritePin(GPIOA,GPIO_PIN_4,1)
 #define LED1_OR()	HAL_GPIO_TogglePin(GPIOA,GPIO_PIN_4)
 
-#define DefaultDeviceADDR	2	   	//默认器件地址
+#define DefaultDeviceADDR	30	   	//默认器件地址
 #define DEVICETYPE			0x023a	   //HCF570设备类型,将十进制710转换为十六进制
 #define SOFTWAREVERSION		0x0400     //软件版本号定义规则：版本号共三位表示，例如1.2.3，表示方法为：高八位表示1，低八位表示23,其中低八位最大表示99
-#define Default_SAMPLE_INTERVAL		1			//默认数据采集间隔，单位10s，720为1小时
+#define Default_SAMPLE_INTERVAL		360			//默认数据采集间隔，单位10s，360为1小时
 #define Default_RX_WINDOW	100			//接收时间窗口，100ms
 
 extern IWDG_HandleTypeDef hiwdg;
